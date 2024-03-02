@@ -1,8 +1,11 @@
 use clap::Parser;
-use log::debug;
+use log::{debug, error};
 use log4rs;
 
+use crate::logs::RawLogs;
+
 mod arg_parser;
+mod logs;
 
 fn main() {
     log4rs::init_file("log4rs.yaml", Default::default())
@@ -10,7 +13,12 @@ fn main() {
 
     let arg_parser = arg_parser::ArgParser::parse();
     debug!(
-        "Provided file path of log file: {}",
+        "Providedlog file path: {}",
         arg_parser.log_file_path().to_str().unwrap()
     );
+
+    match RawLogs::from_file(arg_parser.log_file_path()) {
+        Ok(raw_logs) => debug!("RawLogs abstraction created"),
+        Err(err) => error!("RawLogs creation failed. Error message: {}", err),
+    }
 }
