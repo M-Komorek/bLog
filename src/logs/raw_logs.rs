@@ -1,19 +1,8 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader, Result},
-    path::PathBuf,
-};
+use std::fs::File;
+use std::io::{BufRead, BufReader, Result};
+use std::path::PathBuf;
 
-#[derive(Debug)]
-pub struct RawLog {
-    data: Vec<u8>,
-}
-
-impl RawLog {
-    fn new(data: Vec<u8>) -> RawLog {
-        RawLog { data }
-    }
-}
+type RawLog = Vec<u8>;
 
 #[derive(Debug)]
 pub struct RawLogs {
@@ -28,7 +17,7 @@ impl RawLogs {
         let mut logs = Vec::new();
         for line_result in reader.split(b'\n') {
             let line = line_result?;
-            logs.push(RawLog::new(line));
+            logs.push(line);
         }
 
         Ok(RawLogs { data: logs })
@@ -49,9 +38,9 @@ mod tests {
         let raw_logs_path = temp_file.path().to_path_buf();
         let raw_logs = RawLogs::from_file(&raw_logs_path).expect("should create RawLogs");
 
-        assert_eq!(raw_logs.data[0].data, b"Line 1\n");
-        assert_eq!(raw_logs.data[1].data, b"Line 2\n");
-        assert_eq!(raw_logs.data[2].data, b"Line 3");
+        assert_eq!(raw_logs.data[0], b"Line 1\n");
+        assert_eq!(raw_logs.data[1], b"Line 2\n");
+        assert_eq!(raw_logs.data[2], b"Line 3");
     }
 
     #[test]

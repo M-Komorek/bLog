@@ -1,24 +1,33 @@
+use blog::app::{App, AppResult};
+use blog::arg_parser::ArgParser;
+use blog::event_handler::{handle_key_events, Event, EventHandler};
+use blog::tui::Tui;
 use clap::Parser;
-use log::{debug, error};
 use log4rs;
+use ratatui::backend::CrosstermBackend;
+use ratatui::Terminal;
+use std::io;
 
-use crate::logs::RawLogs;
+fn main() -> AppResult<()> {
+    log4rs::init_file("log4rs.yaml", Default::default())?;
 
-mod arg_parser;
-mod logs;
+    let arg_parser = ArgParser::parse();
+    let mut app = App::new(arg_parser.log_file_path())?;
 
-fn main() {
-    log4rs::init_file("log4rs.yaml", Default::default())
-        .expect("Failed to load log4rs configuration");
+    let backend = CrosstermBackend::new(io::stderr());
+    let terminal = Terminal::new(backend)?;
+    let events = EventHandler::new(250);
+    let mut tui = Tui::new(terminal, events);
+    tui.init()?;
 
-    let arg_parser = arg_parser::ArgParser::parse();
-    debug!(
-        "Providedlog file path: {}",
-        arg_parser.log_file_path().to_str().unwrap()
-    );
-
-    match RawLogs::from_file(arg_parser.log_file_path()) {
-        Ok(raw_logs) => debug!("RawLogs abstraction created"),
-        Err(err) => error!("RawLogs creation failed. Error message: {}", err),
+    while app.running {
+        tui.draw(&mut app)?;
+        match tui.event_handler.next_event()? {
+            Event::Tick => app.tick(),
+            Event::Key(key_event) => handle_key_events(key_event, &mut app)?,
+        }
     }
+
+    tui.exit()?;
+    Ok(())
 }
