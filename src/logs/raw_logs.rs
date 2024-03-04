@@ -38,8 +38,8 @@ mod tests {
         let raw_logs_path = temp_file.path().to_path_buf();
         let raw_logs = RawLogs::from_file(&raw_logs_path).expect("should create RawLogs");
 
-        assert_eq!(raw_logs.data[0], b"Line 1\n");
-        assert_eq!(raw_logs.data[1], b"Line 2\n");
+        assert_eq!(raw_logs.data[0], b"Line 1");
+        assert_eq!(raw_logs.data[1], b"Line 2");
         assert_eq!(raw_logs.data[2], b"Line 3");
     }
 
