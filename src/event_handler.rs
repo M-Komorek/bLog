@@ -72,14 +72,14 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Instant;
 
     #[test]
     fn test_event_handler_tick_event() {
         let tick_rate = 10;
         let event_handler = EventHandler::new(tick_rate);
-
         let start_time = Instant::now();
+        thread::sleep(Duration::from_millis(10));
+
         let event = event_handler.next_event().unwrap();
         assert_eq!(event, Event::Tick);
         assert!(start_time.elapsed() >= Duration::from_millis(tick_rate));
