@@ -1,5 +1,5 @@
-use crate::app::{App, AppResult};
-use crossterm::event::{self, Event as CrosstermEvent, KeyCode, KeyEvent};
+use crate::app::AppResult;
+use crossterm::event::{self, Event as CrosstermEvent, KeyEvent};
 use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
@@ -12,13 +12,13 @@ pub enum Event {
 
 #[allow(dead_code)]
 #[derive(Debug)]
-pub struct EventHandler {
+pub struct EventProxy {
     sender: mpsc::Sender<Event>,
     receiver: mpsc::Receiver<Event>,
     handler: thread::JoinHandle<()>,
 }
 
-impl EventHandler {
+impl EventProxy {
     pub fn new(tick_rate: u64) -> Self {
         let tick_rate = Duration::from_millis(tick_rate);
         let (sender, receiver) = mpsc::channel();
@@ -47,7 +47,7 @@ impl EventHandler {
             })
         };
 
-        EventHandler {
+        EventProxy {
             sender,
             receiver,
             handler,
@@ -59,24 +59,16 @@ impl EventHandler {
     }
 }
 
-pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
-    match key_event.code {
-        KeyCode::Esc | KeyCode::Char('q') => {
-            app.quit();
-        }
-        _ => {}
-    }
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crossterm::event::KeyCode;
 
     #[test]
-    fn test_event_handler_tick_event() {
+    fn test_event_proxy_tick_event() {
         let tick_rate = 10;
-        let event_handler = EventHandler::new(tick_rate);
+        let event_handler = EventProxy::new(tick_rate);
+
         let start_time = Instant::now();
         thread::sleep(Duration::from_millis(10));
 
@@ -86,9 +78,9 @@ mod tests {
     }
 
     #[test]
-    fn test_event_handler_key_event() {
+    fn test_event_proxy_key_event() {
         let tick_rate = 10;
-        let event_handler = EventHandler::new(tick_rate);
+        let event_handler = EventProxy::new(tick_rate);
 
         let key_event = KeyEvent {
             code: KeyCode::Char('a'),
@@ -101,26 +93,4 @@ mod tests {
         let received_key_event = event_handler.next_event().unwrap();
         assert_eq!(received_key_event, Event::Key(key_event));
     }
-
-    //TODO: write tests for test_handle_key_events after inytoduce of IMP
-    /*    #[test]
-    fn test_handle_key_events_quit() {
-        let mut app = App::new();
-        let key_event_q = KeyEvent {
-            code: KeyCode::Char('q'),
-            modifiers: event::KeyModifiers::empty(),
-            kind: event::KeyEventKind::Press,
-            state: event::KeyEventState::empty(),
-        };
-        let key_event_esc = KeyEvent {
-            code: KeyCode::Esc,
-            modifiers: event::KeyModifiers::empty(),
-            kind: event::KeyEventKind::Press,
-            state: event::KeyEventState::empty(),
-        };
-
-        handle_key_events(key_event_q, &mut app).unwrap();
-        assert!(app.is_quitting());
-    }
-    */
 }

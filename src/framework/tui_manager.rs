@@ -1,7 +1,8 @@
+use super::event_proxy::EventProxy;
 use crate::app::{App, AppResult};
-use crate::event_handler::EventHandler;
 use crate::ui;
-use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
+
+use crossterm::event::DisableMouseCapture;
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
@@ -9,26 +10,26 @@ use std::io;
 use std::panic;
 
 #[derive(Debug)]
-pub struct Tui<B: Backend> {
+pub struct TuiManager<B: Backend> {
+    pub event_proxy: EventProxy,
     terminal: Terminal<B>,
-    pub event_handler: EventHandler,
 }
 
-impl<B: Backend> Tui<B> {
-    pub fn new(terminal: Terminal<B>, event_handler: EventHandler) -> Self {
+impl<B: Backend> TuiManager<B> {
+    pub fn new(terminal: Terminal<B>, event_proxy: EventProxy) -> Self {
         Self {
+            event_proxy,
             terminal,
-            event_handler,
         }
     }
 
     pub fn init(&mut self) -> AppResult<()> {
         terminal::enable_raw_mode()?;
-        crossterm::execute!(io::stderr(), EnterAlternateScreen, EnableMouseCapture)?;
+        crossterm::execute!(io::stderr(), EnterAlternateScreen, DisableMouseCapture)?;
 
         let panic_hook = panic::take_hook();
         panic::set_hook(Box::new(move |panic| {
-            Self::reset().expect("failed to reset the terminal");
+            Self::reset().expect("Failed to reset the terminal");
             panic_hook(panic);
         }));
 
@@ -38,7 +39,8 @@ impl<B: Backend> Tui<B> {
     }
 
     pub fn draw(&mut self, app: &mut App) -> AppResult<()> {
-        self.terminal.draw(|frame| ui::render(app, frame))?;
+        self.terminal
+            .draw(|frame| ui::main_component::render(app, frame))?;
         Ok(())
     }
 
@@ -50,7 +52,7 @@ impl<B: Backend> Tui<B> {
 
     fn reset() -> AppResult<()> {
         terminal::disable_raw_mode()?;
-        crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
+        crossterm::execute!(io::stderr(), LeaveAlternateScreen)?;
         Ok(())
     }
 }

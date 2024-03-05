@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 
-use crate::logs::RawLogs;
-
-pub type AppResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+use super::logs::RawLogs;
+use super::AppResult;
 
 pub struct App {
     pub running: bool,

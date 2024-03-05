@@ -1,7 +1,6 @@
 use blog::app::{App, AppResult};
-use blog::arg_parser::ArgParser;
-use blog::event_handler::{handle_key_events, Event, EventHandler};
-use blog::tui::Tui;
+use blog::framework::{event_proxy, handlers, ArgParser, EventProxy, TuiManager};
+
 use clap::Parser;
 use log4rs;
 use ratatui::backend::CrosstermBackend;
@@ -16,15 +15,15 @@ fn main() -> AppResult<()> {
 
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
-    let events = EventHandler::new(250);
-    let mut tui = Tui::new(terminal, events);
+    let event_proxy = EventProxy::new(250);
+    let mut tui = TuiManager::new(terminal, event_proxy);
     tui.init()?;
 
     while app.running {
         tui.draw(&mut app)?;
-        match tui.event_handler.next_event()? {
-            Event::Tick => app.tick(),
-            Event::Key(key_event) => handle_key_events(key_event, &mut app)?,
+        match tui.event_proxy.next_event()? {
+            event_proxy::Event::Tick => app.tick(),
+            event_proxy::Event::Key(key_event) => handlers::handle_key_events(key_event, &mut app)?,
         }
     }
 
