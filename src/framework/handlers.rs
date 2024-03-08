@@ -3,7 +3,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_event.code {
-        KeyCode::Esc | KeyCode::Char('q') => {
+        KeyCode::Char('q') => {
             app.quit();
         }
         _ => {}
@@ -13,26 +13,25 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crossterm::event;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
 
-    //TODO: write tests for test_handle_key_events after inytoduce of IMP
-    /*    #[test]
-    fn test_handle_key_events_quit() {
-        let mut app = App::new();
+    #[test]
+    fn test_handle_key_events_for_quit() {
+        let mut temp_file = NamedTempFile::new().expect("should create NamedTempFile");
+        write!(temp_file, "Line of logs").expect("should write a line of logs");
+        let mut app = App::new(&temp_file.path().to_path_buf()).expect("should create App");
+
         let key_event_q = KeyEvent {
             code: KeyCode::Char('q'),
             modifiers: event::KeyModifiers::empty(),
             kind: event::KeyEventKind::Press,
             state: event::KeyEventState::empty(),
         };
-        let key_event_esc = KeyEvent {
-            code: KeyCode::Esc,
-            modifiers: event::KeyModifiers::empty(),
-            kind: event::KeyEventKind::Press,
-            state: event::KeyEventState::empty(),
-        };
 
-        handle_key_events(key_event_q, &mut app).unwrap();
-        assert!(app.is_quitting());
+        handle_key_events(key_event_q, &mut app).expect("should handle q key event");
+        assert!(app.running == false);
     }
-    */
 }
