@@ -1,13 +1,14 @@
-use ratatui::widgets::{Block, Paragraph};
+use ratatui::widgets::List;
 use ratatui::Frame;
 
 use crate::app::App;
 
-pub fn render(_app: &mut App, frame: &mut Frame) {
-    frame.render_widget(
-        Paragraph::new(format!("Press `Esc`  or `q` to stop running."))
-            .block(Block::bordered().title(" -  bLog  - "))
-            .centered(),
-        frame.size(),
-    )
+use log::debug;
+
+pub fn render(app: &mut App, frame: &mut Frame) {
+    let items = app.log_view.get_current_page();
+    debug!("items: {:?}", items);
+    let log_list = List::new(items);
+
+    frame.render_widget(log_list, frame.size())
 }

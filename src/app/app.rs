@@ -1,19 +1,19 @@
 use std::path::PathBuf;
 
-use super::logs::RawLogs;
+use super::logs::LogView;
 use super::AppResult;
 
 pub struct App {
     pub running: bool,
-    pub raw_logs: RawLogs,
+    pub log_view: LogView,
 }
 
 impl App {
     pub fn new(log_file_path: &PathBuf) -> AppResult<App> {
-        let raw_logs = RawLogs::from_file(log_file_path)?;
+        let log_view = LogView::from_file(log_file_path)?;
         Ok(App {
             running: true,
-            raw_logs,
+            log_view,
         })
     }
 

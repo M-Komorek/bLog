@@ -22,6 +22,14 @@ impl RawLogs {
 
         Ok(RawLogs { data: logs })
     }
+
+    pub fn data(&self) -> &[RawLog] {
+        &self.data
+    }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
 }
 
 #[cfg(test)]
