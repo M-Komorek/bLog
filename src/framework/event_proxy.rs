@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 pub enum Event {
     Tick,
     Key(KeyEvent),
+    Resize(u16, u16),
 }
 
 #[allow(dead_code)]
@@ -34,6 +35,9 @@ impl EventProxy {
                     if event::poll(timeout).expect("Failed to poll new events") {
                         match event::read().expect("Unable to read event") {
                             CrosstermEvent::Key(e) => sender.send(Event::Key(e)),
+                            CrosstermEvent::Resize(columns, rows) => {
+                                sender.send(Event::Resize(columns, rows))
+                            }
                             _ => Ok(()),
                         }
                         .expect("Failed to send terminal event")

@@ -17,6 +17,11 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     Ok(())
 }
 
+pub fn handle_resize_event(rows: u16, app: &mut App) -> AppResult<()> {
+    app.log_view.set_lines_per_page(rows as usize);
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -28,7 +33,7 @@ mod tests {
     fn test_handle_key_events_for_quit() {
         let mut temp_file = NamedTempFile::new().expect("should create NamedTempFile");
         write!(temp_file, "Line of logs").expect("should write a line of logs");
-        let mut app = App::new(&temp_file.path().to_path_buf()).expect("should create App");
+        let mut app = App::new(&temp_file.path().to_path_buf(), 0).expect("should create App");
 
         let key_event_q = KeyEvent {
             code: KeyCode::Char('q'),
