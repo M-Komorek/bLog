@@ -4,10 +4,10 @@ use crossterm::event::{KeyCode, KeyEvent};
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_event.code {
         KeyCode::Char('j') => {
-            app.log_view.next_page();
+            app.log_view.next();
         }
         KeyCode::Char('k') => {
-            app.log_view.prev_page();
+            app.log_view.previous();
         }
         KeyCode::Char('q') => {
             app.quit();

@@ -1,4 +1,4 @@
-use ratatui::text::Text;
+use ratatui::{text::Text, widgets::ListState};
 use std::str;
 
 use super::raw_logs::RawLogs;
@@ -7,6 +7,7 @@ pub struct LogView {
     raw_logs: RawLogs,
     lines_per_page: usize,
     current_page: usize,
+    pub state: ListState,
 }
 
 impl LogView {
@@ -15,6 +16,7 @@ impl LogView {
             raw_logs,
             lines_per_page,
             current_page: 1,
+            state: ListState::default(),
         }
     }
 
@@ -41,6 +43,36 @@ impl LogView {
         if self.current_page > 1 {
             self.current_page -= 1;
         }
+    }
+
+    pub fn next(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.lines_per_page - 1 {
+                    self.next_page();
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn previous(&mut self) {
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.prev_page();
+                    self.lines_per_page - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
     }
 
     pub fn set_lines_per_page(&mut self, lines_per_page: usize) {
