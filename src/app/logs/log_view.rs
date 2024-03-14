@@ -8,6 +8,7 @@ pub struct LogView {
     lines_per_page: usize,
     current_page: usize,
     pub state: ListState,
+    pub horizontal_scroll: usize,
 }
 
 impl LogView {
@@ -17,6 +18,7 @@ impl LogView {
             lines_per_page,
             current_page: 1,
             state: ListState::default(),
+            horizontal_scroll: 0,
         }
     }
 
@@ -28,7 +30,11 @@ impl LogView {
             .iter()
             .map(|log| {
                 let text = str::from_utf8(log).unwrap();
-                Text::from(text.to_owned())
+                if self.horizontal_scroll > text.len() {
+                    Text::from("")
+                } else {
+                    Text::from(text[self.horizontal_scroll..].to_owned())
+                }
             })
             .collect()
     }

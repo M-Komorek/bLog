@@ -12,6 +12,12 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         KeyCode::Char('q') => {
             app.quit();
         }
+        KeyCode::Char('h') | KeyCode::Left => {
+            app.log_view.horizontal_scroll = app.log_view.horizontal_scroll.saturating_sub(30);
+        }
+        KeyCode::Char('l') | KeyCode::Right => {
+            app.log_view.horizontal_scroll = app.log_view.horizontal_scroll.saturating_add(30);
+        }
         _ => {}
     }
     Ok(())

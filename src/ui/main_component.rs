@@ -12,7 +12,7 @@ const TEXT_COLOR: Color = tailwind::SLATE.c200;
 pub fn render(app: &mut App, frame: &mut Frame) {
     let items = app.log_view.get_current_page_logs();
 
-    let outer_block = Block::default().borders(Borders::all());
+    let outer_block = Block::default();
 
     let inner_block = Block::default()
         .borders(Borders::NONE)
