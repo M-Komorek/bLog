@@ -4,3 +4,4 @@ mod logs;
 
 pub use app::App;
 pub use app_result::AppResult;
+pub use logs::LogViewer;
