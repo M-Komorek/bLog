@@ -1,10 +1,9 @@
 use ratatui::prelude::*;
-use ratatui::widgets::{Block, Borders, HighlightSpacing, List};
+use ratatui::widgets::{Block, Borders, HighlightSpacing, List, Table};
 use ratatui::Frame;
 use style::palette::tailwind;
 
 use crate::app::App;
-use crate::app::LogViewer;
 
 const NORMAL_ROW_COLOR: Color = tailwind::SLATE.c950;
 const SELECTED_STYLE_FG: Color = tailwind::BLUE.c300;
@@ -42,6 +41,30 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
     frame.render_stateful_widget(log_list, inner_area, &mut app.log_view.state.clone());
 
-    let log_viewer = LogViewer {};
-    frame.render_widget(log_viewer, layout[1]);
+    let items2 = app.log_view.get_current_page_logs_rows();
+
+    let outer_block2 = Block::default();
+
+    let inner_block2 = Block::default()
+        .borders(Borders::NONE)
+        .fg(TEXT_COLOR)
+        .bg(NORMAL_ROW_COLOR);
+
+    let outer_area2 = layout[1];
+    let inner_area2 = outer_block2.inner(outer_area2);
+
+    outer_block2.render(outer_area, frame.buffer_mut());
+
+    let table = Table::new(
+        items2,
+        [Constraint::Percentage(5), Constraint::Percentage(95)],
+    )
+    .block(inner_block2)
+    .highlight_style(
+        Style::default()
+            .add_modifier(Modifier::REVERSED)
+            .fg(SELECTED_STYLE_FG),
+    );
+
+    frame.render_stateful_widget(table, inner_area2, &mut app.log_view.table_state.clone());
 }

@@ -24,7 +24,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
 }
 
 pub fn handle_resize_event(rows: u16, app: &mut App) -> AppResult<()> {
-    app.log_view.set_lines_per_page(rows as usize);
+    app.log_view.set_lines_per_page((rows / 2) as usize);
     Ok(())
 }
 
