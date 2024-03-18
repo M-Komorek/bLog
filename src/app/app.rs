@@ -9,9 +9,9 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(log_file_path: &PathBuf, log_view_width: usize) -> AppResult<App> {
+    pub fn new(log_file_path: &PathBuf) -> AppResult<App> {
         let raw_logs = RawLogs::from_file(log_file_path)?;
-        let log_view = LogView::new(raw_logs, log_view_width);
+        let log_view = LogView::new(raw_logs);
 
         Ok(App {
             running: true,

@@ -1,88 +1,65 @@
-use ratatui::{
-    text::Text,
-    widgets::{ListState, Row, TableState},
-};
-use std::str;
+use ratatui::widgets::{Row, TableState};
 
 use super::raw_logs::RawLogs;
 
+const NUMBER_OF_LOGS_PER_PAGE: usize = 100;
+
 pub struct LogView {
     raw_logs: RawLogs,
-    lines_per_page: usize,
-    current_page: usize,
-    pub state: ListState,
+    current_page_numer: usize,
     pub table_state: TableState,
     pub horizontal_scroll: usize,
 }
 
 impl LogView {
-    pub fn new(raw_logs: RawLogs, lines_per_page: usize) -> LogView {
+    pub fn new(raw_logs: RawLogs) -> LogView {
+        let table_state = TableState::default().with_selected(Some(0));
+
         LogView {
             raw_logs,
-            lines_per_page,
-            current_page: 1,
-            state: ListState::default(),
-            table_state: TableState::default(),
+            current_page_numer: 0,
+            table_state,
             horizontal_scroll: 0,
         }
     }
 
-    pub fn get_current_page_logs(&self) -> Vec<Text> {
-        let start_index = (self.current_page - 1) * self.lines_per_page;
-        let end_index = std::cmp::min(self.raw_logs.len(), start_index + self.lines_per_page);
-
-        self.raw_logs.data()[start_index..end_index]
-            .iter()
-            .map(|log| {
-                let text = str::from_utf8(log).unwrap();
-                if self.horizontal_scroll > text.len() {
-                    Text::from("")
-                } else {
-                    Text::from(text[self.horizontal_scroll..].to_owned())
-                }
-            })
-            .collect()
-    }
-
     pub fn get_current_page_logs_rows(&self) -> Vec<Row> {
-        let start_index = (self.current_page - 1) * self.lines_per_page;
-        let end_index = std::cmp::min(self.raw_logs.len(), start_index + self.lines_per_page);
+        let start_index = (self.current_page_numer) * NUMBER_OF_LOGS_PER_PAGE;
+        let end_index = std::cmp::min(self.raw_logs.len(), start_index + NUMBER_OF_LOGS_PER_PAGE);
 
-        self.raw_logs.data()[start_index..end_index]
+        let mut rows = Vec::with_capacity(NUMBER_OF_LOGS_PER_PAGE);
+        for (id, log) in self.raw_logs.data()[start_index..end_index]
             .iter()
             .enumerate()
-            .map(|(idexd, log)| {
-                let original_index = start_index + idexd;
-                let index = original_index.to_string();
-                let mut text = str::from_utf8(log).unwrap().to_string();
+        {
+            let text = if self.horizontal_scroll > log.len() {
+                "".to_string()
+            } else {
+                String::from_utf8_lossy(&log[self.horizontal_scroll..]).to_string()
+            };
+            let index = (start_index + id).to_string();
+            rows.push(Row::new(vec![index, text]));
+        }
 
-                if self.horizontal_scroll > text.len() {
-                    text.clear();
-                } else {
-                    text = text[self.horizontal_scroll..].to_owned();
-                }
-
-                Row::new(vec![index, text])
-            })
-            .collect()
+        rows
     }
 
     pub fn next_page(&mut self) {
-        if (self.current_page * self.lines_per_page) < self.raw_logs.len() {
-            self.current_page += 1;
+        if (self.current_page_numer * NUMBER_OF_LOGS_PER_PAGE) < self.raw_logs.len() {
+            self.current_page_numer += 1;
         }
     }
 
     pub fn prev_page(&mut self) {
-        if self.current_page > 1 {
-            self.current_page -= 1;
+        if self.current_page_numer > 0 {
+            self.current_page_numer -= 1;
         }
     }
 
     pub fn next(&mut self) {
-        let i = match self.state.selected() {
+        let i = match self.table_state.selected() {
             Some(i) => {
-                if i >= self.lines_per_page - 1 {
+                if i >= NUMBER_OF_LOGS_PER_PAGE - 1 {
                     self.next_page();
                     0
                 } else {
@@ -91,27 +68,21 @@ impl LogView {
             }
             None => 0,
         };
-        self.state.select(Some(i));
         self.table_state.select(Some(i));
     }
 
     pub fn previous(&mut self) {
-        let i = match self.state.selected() {
+        let i = match self.table_state.selected() {
             Some(i) => {
                 if i == 0 {
                     self.prev_page();
-                    self.lines_per_page - 1
+                    NUMBER_OF_LOGS_PER_PAGE - 1
                 } else {
                     i - 1
                 }
             }
             None => 0,
         };
-        self.state.select(Some(i));
         self.table_state.select(Some(i));
-    }
-
-    pub fn set_lines_per_page(&mut self, lines_per_page: usize) {
-        self.lines_per_page = 100;
     }
 }
