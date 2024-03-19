@@ -75,8 +75,12 @@ impl LogView {
         let i = match self.table_state.selected() {
             Some(i) => {
                 if i == 0 {
-                    self.prev_page();
-                    NUMBER_OF_LOGS_PER_PAGE - 1
+                    if self.current_page_numer == 0 {
+                        0
+                    } else {
+                        self.prev_page();
+                        NUMBER_OF_LOGS_PER_PAGE - 1
+                    }
                 } else {
                     i - 1
                 }
