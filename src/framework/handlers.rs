@@ -4,19 +4,21 @@ use crossterm::event::{KeyCode, KeyEvent};
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_event.code {
         KeyCode::Char('j') => {
-            app.log_view.next();
+            app.log_view_service.next_log();
         }
         KeyCode::Char('k') => {
-            app.log_view.previous();
+            app.log_view_service.previous_log();
         }
         KeyCode::Char('q') => {
             app.quit();
         }
         KeyCode::Char('h') | KeyCode::Left => {
-            app.log_view.horizontal_scroll = app.log_view.horizontal_scroll.saturating_sub(30);
+            app.log_view_service.horizontal_offset =
+                app.log_view_service.horizontal_offset.saturating_sub(30);
         }
         KeyCode::Char('l') | KeyCode::Right => {
-            app.log_view.horizontal_scroll = app.log_view.horizontal_scroll.saturating_add(30);
+            app.log_view_service.horizontal_offset =
+                app.log_view_service.horizontal_offset.saturating_add(30);
         }
         _ => {}
     }

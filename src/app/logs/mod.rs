@@ -1,7 +1,9 @@
 mod log_view;
-mod log_viewer;
+mod log_view_service;
 mod raw_logs;
 
 pub use log_view::LogView;
-pub use log_viewer::LogViewer;
+
+pub use log_view_service::LogViewService;
+
 pub use raw_logs::RawLogs;

@@ -1,16 +1,16 @@
 use ratatui::prelude::*;
-use ratatui::widgets::{Block, Borders, Table};
+use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 use style::palette::tailwind;
 
 use crate::app::App;
+use crate::app::LogView;
 
 const NORMAL_ROW_COLOR: Color = tailwind::SLATE.c950;
-const SELECTED_STYLE_FG: Color = tailwind::BLUE.c300;
 const TEXT_COLOR: Color = tailwind::SLATE.c200;
 
 pub fn render(app: &mut App, frame: &mut Frame) {
-    let items = app.log_view.get_current_page_logs_rows();
+    let items = app.log_view_service.get_current_page_logs_rows();
 
     let outer_block = Block::default();
 
@@ -24,16 +24,16 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
     outer_block.render(outer_area, frame.buffer_mut());
 
-    let table = Table::new(
+    let log_view = LogView::new(
         items,
         [Constraint::Percentage(5), Constraint::Percentage(95)],
     )
     .block(inner_block)
-    .highlight_style(
-        Style::default()
-            .add_modifier(Modifier::REVERSED)
-            .fg(SELECTED_STYLE_FG),
-    );
+    .highlight_style(Style::default().fg(Color::Yellow));
 
-    frame.render_stateful_widget(table, inner_area, &mut app.log_view.table_state.clone());
+    frame.render_stateful_widget(
+        log_view,
+        inner_area,
+        &mut app.log_view_service.log_view_state.clone(),
+    );
 }
