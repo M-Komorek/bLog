@@ -14,4 +14,4 @@ Thank God it's Friday. A day spent briefly analyzing how could I write my own wi
 Thinking about how to properly implement SOLID principials.
 
 ## Day 22 updata
-Fightinh with borrow checker.
+Fighting with borrow checker.
