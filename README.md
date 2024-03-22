@@ -11,4 +11,7 @@ A day spent trying to add a horizontal scroll bar to my log view. It turned out 
 Thank God it's Friday. A day spent briefly analyzing how could I write my own widget in `ratatui`. Is seems to be quite complex, especially the issue of optimal widget rendering.
 
 ## Day 21 updata
-Thinking about how to properly implement SOLID principials .
+Thinking about how to properly implement SOLID principials.
+
+## Day 22 updata
+Fightinh with borrow checker.
